@@ -13,4 +13,5 @@ Scriptet er skrevet i Python og kræver følgende for at fungere:
 
 Bruges således:
 python dbareposter.py username password [--keep]
---keep=x: Venter indtil scriptet er kørt x-antal gange før repostede listings slettes.
+--keep=value: Venter indtil scriptet er kørt x-antal gange før repostede listings slettes.
+--verify=value: Slå SSL verifikation til eller fra, med argumenterne "True" og "False".
