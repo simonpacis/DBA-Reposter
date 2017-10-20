@@ -132,6 +132,7 @@ class Listing:
                "bundleTypeId": 4
             },
             "syiId": self.syi_id,
+            "bundleTypeId": package,
             "listingType": {
                "selectedListingType": 2
             }
@@ -149,9 +150,10 @@ class Listing:
 
 keep = 10
 verify = True
+package = 4
 
 if len(sys.argv) <= 1:
-   print("Usage: python %s username password [--keep=value] [--verify=value] \n\tusername: Username/email for dba.dk\n\tpassword: Password for dba.dk\n\t--keep: Does not delete the original listing after repost.\n\t--verify: Whether or not to perform SSL verification." % (sys.argv[0]))
+   print("Usage: python %s username password [--keep=value] [--verify=value] [--premium=value] \n\tusername: Username/email for dba.dk\n\tpassword: Password for dba.dk\n\t--keep: Does not delete the original listing after repost.\n\t--verify: Whether or not to perform SSL verification.\n\t--premium: Whether or not to post new listings as premium listings." % (sys.argv[0]))
    sys.exit(0)
 else:
     args = sys.argv[3:]
@@ -166,7 +168,14 @@ else:
                 verify = True
             else:
                 verify = False
-            print("SSL verification set to " + str(verify))
+            print("SSL verification set to %s." % str(verify))
+        elif argu == "--premium":
+            if(val.lower() == "true"):
+                package = 3
+                print("Package tier set to premium.")
+            else:
+                package = 4
+                print("Package tier set to free.")
 
 if(os.stat("listings.json").st_size == 0):
    listings_file = {}
