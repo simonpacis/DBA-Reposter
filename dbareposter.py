@@ -27,7 +27,7 @@ class Listing:
       self.custom_id = iter
       self.listing_id = l['ad-external-id']
       info = requests.get("https://api.dba.dk/api/v2/listing/%s/secondaryinfo" %
-                          self.listing_id, headers=headers).json()
+                          self.listing_id, headers=headers, verify=verify).json()
       self.category = int(l['classification']['id'])
       self.matrixData = l['matrixdata']
       if l['additional-text'] != "null":
@@ -56,10 +56,10 @@ class Listing:
           'Content-Type': 'image/jpeg', 'User-Agent': 'dba/5.4.3 iPhone 10.0.1 (iPhone6,2)', 'Authorization': 'oauth ' + access_token}
 
       request = requests.put(
-          "https://api.dba.dk/api/v2/syi/start", headers=headers).json()
+          "https://api.dba.dk/api/v2/syi/start", headers=headers, verify=verify).json()
       self.syi_id = request['syi']['syiId']
       request = requests.post("https://api.dba.dk/api/v2/syi/classification?format=json", data={
-                              'syiId': self.syi_id, 'classificationId': self.category, 'listingType': -1}, headers=syi_headers).json()
+                              'syiId': self.syi_id, 'classificationId': self.category, 'listingType': -1}, headers=syi_headers, verify=verify).json()
       crafted_matrixData = []
       for group in self.matrixData:
          # match group['label'] with
@@ -96,13 +96,13 @@ class Listing:
                with open("images/" + str(self.custom_id) + "/" + str(iter) + '.jpg', 'rb') as fh:
                   image = fh.read()
                   request = requests.post(
-                      "https://api.dba.dk/api/v2/syi/pictures/upload/", headers=upload_headers, data=image).json()
+                      "https://api.dba.dk/api/v2/syi/pictures/upload/", headers=upload_headers, data=image, verify=verify).json()
                self.pictures.append(request["pictureIds"][0])
-         request = requests.post("https://api.dba.dk/api/v2/syi/pictures/set/", headers=headers, json={'syiId': self.syi_id, 'pictures': self.pictures}).json()
+         request = requests.post("https://api.dba.dk/api/v2/syi/pictures/set/", headers=headers, json={'syiId': self.syi_id, 'pictures': self.pictures}, verify=verify).json()
       else:
-         request = requests.post("https://api.dba.dk/api/v2/syi/pictures/set/", headers=headers, json={'syiId': self.syi_id, 'pictures': []}).json()
-      user = requests.get("https://api.dba.dk/api/v2/user", headers=headers).json()
-      profile = requests.get("https://api.dba.dk/api/v2/user/profile", headers=headers).json()
+         request = requests.post("https://api.dba.dk/api/v2/syi/pictures/set/", headers=headers, json={'syiId': self.syi_id, 'pictures': []}, verify=verify).json()
+      user = requests.get("https://api.dba.dk/api/v2/user", headers=headers, verify=verify).json()
+      profile = requests.get("https://api.dba.dk/api/v2/user/profile", headers=headers, verify=verify).json()
 
       craft = {
             "matrixData": crafted_matrixData,
@@ -139,24 +139,34 @@ class Listing:
       if self.additional_text != None:
          craft["listingInfo"] = {"additionalText":self.additional_text}
 
-      request = requests.post("https://api.dba.dk/api/v2/syi/create/%s" % (self.syi_id), json=craft, headers=syi_headers).json()
-      request = requests.post("https://api.dba.dk/api/v2/syi/publish/%s?format=json" % (self.syi_id), headers=syi_headers, data={"syiId": self.syi_id}).json()
+      request = requests.post("https://api.dba.dk/api/v2/syi/create/%s" % (self.syi_id), json=craft, headers=syi_headers, verify=verify).json()
+      request = requests.post("https://api.dba.dk/api/v2/syi/publish/%s?format=json" % (self.syi_id), headers=syi_headers, verify=verify, data={"syiId": self.syi_id}).json()
       return
 
    def delete(self):
-      request = requests.post("https://api.dba.dk/api/v2/ads/%s/delete/?sold=false" % self.listing_id, headers=headers).json()
+      request = requests.post("https://api.dba.dk/api/v2/ads/%s/delete/?sold=false" % self.listing_id, headers=headers, verify=verify).json()
       return
 
 keep = 10
+verify = True
 
 if len(sys.argv) <= 1:
-   print("Usage: python %s username password [-keep] \n\tusername: Username/email for dba.dk\n\tpassword: Password for dba.dk\n\t-keep: Does not delete the original listing after repost." % (sys.argv[0]))
+   print("Usage: python %s username password [--keep=value] [--verify=value] \n\tusername: Username/email for dba.dk\n\tpassword: Password for dba.dk\n\t--keep: Does not delete the original listing after repost.\n\t--verify: Whether or not to perform SSL verification." % (sys.argv[0]))
    sys.exit(0)
-elif len(sys.argv) == 4:
-   keep = int(sys.argv[3].split("=")[1])
-   print("Amount of days to keep listing alive set to %s." % (keep))
 else:
-   print("Amount of days to keep listing alive set to %s." % (keep))
+    args = sys.argv[3:]
+    for arg in args:
+        argu = arg.split("=")[0]
+        val = arg.split("=")[1]
+        if argu == "--keep":
+            keep = int(val)
+            print("Amount of days to keep listing alive set to %s." % (keep))
+        elif argu == "--verify":
+            if(val.lower() == "true"):
+                verify = True
+            else:
+                verify = False
+            print("SSL verification set to " + str(verify))
 
 if(os.stat("listings.json").st_size == 0):
    listings_file = {}
@@ -169,14 +179,14 @@ password = bytes(sys.argv[2], 'UTF-8')
 
 login_url = "https://api.dba.dk/api/v2/oauth/accesstoken"
 login_headers = {'dbaapikey': '2abb0a87-9e2f-4bdd-3d79-08d3e9335416', 'User-Agent': 'dba/5.4.3 iPhone 10.0.1 (iPhone6,2)'}
-r = requests.post(login_url, data={'username': username, 'password': password}, headers= login_headers).json()
+r = requests.post(login_url, data={'username': username, 'password': password}, headers= login_headers, verify=verify).json()
 
 if(r['success'] == True):
    logged_in = True
    access_token = r['access_token']
    refresh_token = r['refresh_token']
    headers = {'dbaapikey': '2abb0a87-9e2f-4bdd-3d79-08d3e9335416', 'Content-Type':'application/json', 'User-Agent': 'dba/5.4.3 iPhone 10.0.1 (iPhone6,2)', 'Authorization': 'oauth ' + access_token}
-   print("Logged in as: " + requests.get("https://api.dba.dk/api/v2/user/profile", headers=headers).json()['summary']['display-name'])
+   print("Logged in as: " + requests.get("https://api.dba.dk/api/v2/user/profile", headers=headers, verify=verify).json()['summary']['display-name'])
 else:
    print("Incorrect credentials. Exiting script.")
    logged_in = False
@@ -184,11 +194,11 @@ else:
 
 # Get ads/listings
 ads_url = "https://api.dba.dk/api/v2/ads/user"
-r = requests.get(ads_url, headers=headers).json()
+r = requests.get(ads_url, headers=headers, verify=verify).json()
 amount_of_listings = len(r)
 
 for listing in r:
-   comments = requests.get("https://api.dba.dk/api/v2/ads/%s/posts" % (listing["ad-external-id"]), headers=headers).json()
+   comments = requests.get("https://api.dba.dk/api/v2/ads/%s/posts" % (listing["ad-external-id"]), headers=headers, verify=verify).json()
    if (listing['ad-status']['status-id'] == 2) or (len(comments) > 0):
       amount_of_listings -= 1
 
@@ -201,7 +211,7 @@ else:
    print("Running listings.")
    iter = 0
    for l in r:
-      comments = requests.get("https://api.dba.dk/api/v2/ads/%s/posts" % (l["ad-external-id"]), headers=headers).json()
+      comments = requests.get("https://api.dba.dk/api/v2/ads/%s/posts" % (l["ad-external-id"]), headers=headers, verify=verify).json()
       if (l['ad-status']['status-id'] == 2) or (len(comments) > 0):
          continue
       else:
