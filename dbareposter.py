@@ -162,20 +162,22 @@ else:
         val = arg.split("=")[1]
         if argu == "--keep":
             keep = int(val)
-            print("Amount of days to keep listing alive set to %s." % (keep))
         elif argu == "--verify":
             if(val.lower() == "true"):
                 verify = True
+                print("SSL verification set to %s." % str(verify).lower()) # Keep these prints here, as this should only print if the argument is set.
             else:
                 verify = False
-            print("SSL verification set to %s." % str(verify))
+                print("SSL verification set to %s." % str(verify).lower()) # Keep these prints here, as this should only print if the argument is set.
         elif argu == "--premium":
             if(val.lower() == "true"):
                 package = 3
-                print("Package tier set to premium.")
             else:
                 package = 4
-                print("Package tier set to free.")
+
+print("Amount of days to keep listing alive set to %s." % (keep))
+print("Package tier set to " + ('premium' if package == 3 else 'free') + ".")
+print("\n")
 
 if(os.stat("listings.json").st_size == 0):
    listings_file = {}
