@@ -151,9 +151,10 @@ class Listing:
 keep = 10
 verify = True
 package = 4
+run_any_listing = False
 
 if len(sys.argv) <= 1:
-   print("Usage: python %s username password [--keep=value] [--verify=value] [--premium=value] \n\tusername: Username/email for dba.dk\n\tpassword: Password for dba.dk\n\t--keep: Does not delete the original listing after repost.\n\t--verify: Whether or not to perform SSL verification.\n\t--premium: Whether or not to post new listings as premium listings." % (sys.argv[0]))
+   print("Usage: python %s username password [--keep=integer|default:10] [--premium=boolean|default:false] [--repostall=boolean|default:false] [--verify=boolean|default:false] \n\tusername: Username/email for dba.dk\n\tpassword: Password for dba.dk\n\t--keep: Does not delete the original listing after repost.\n\t--repostall: Whether or not to repost a listing even if it is inactive or has comments.\n\t--premium: Whether or not to post new listings as premium listings.\n\t--verify: Whether or not to perform SSL verification." % (sys.argv[0]))
    sys.exit(0)
 else:
     args = sys.argv[3:]
@@ -174,9 +175,15 @@ else:
                 package = 3
             else:
                 package = 4
+        elif argu == "--repostall":
+            if(val.lower() == "true"):
+                run_any_listing = True
+            else:
+                run_any_listing = False
 
 print("Amount of days to keep listing alive set to %s." % (keep))
 print("Package tier set to " + ('premium' if package == 3 else 'free') + ".")
+print(('Reposting only active listings with no comments.' if run_any_listing == False else 'Reposting all listings.'))
 print("\n")
 
 if(os.stat("listings.json").st_size == 0):
@@ -210,20 +217,20 @@ amount_of_listings = len(r)
 
 for listing in r:
    comments = requests.get("https://api.dba.dk/api/v2/ads/%s/posts" % (listing["ad-external-id"]), headers=headers, verify=verify).json()
-   if (listing['ad-status']['status-id'] == 2) or (len(comments) > 0):
+   if (listing['ad-status']['status-id'] == 2) or (len(comments) > 0) and run_any_listing == False:
       amount_of_listings -= 1
 
 if amount_of_listings == 0:
-   print("Amount of active listings with no comments: 0. Exiting script.")
+   print("Amount of listings to repost: 0. Exiting script.")
    sys.exit(0)
 else:
 
-   print("Amount of active listings with no comments: %s.\n" % (amount_of_listings))
+   print("Amount of listings to repost: %s.\n" % (amount_of_listings))
    print("Running listings.")
    iter = 0
    for l in r:
       comments = requests.get("https://api.dba.dk/api/v2/ads/%s/posts" % (l["ad-external-id"]), headers=headers, verify=verify).json()
-      if (l['ad-status']['status-id'] == 2) or (len(comments) > 0):
+      if (l['ad-status']['status-id'] == 2) or (len(comments) > 0 and run_any_listing == False):
          continue
       else:
          iter = iter + 1
