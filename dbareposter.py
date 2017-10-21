@@ -9,7 +9,7 @@ import urllib.request
 import json
 import shutil
 
-print("\n        =========================== \n       |        DBA Reposter       |\n       |   by Simon Klit-Johnson   |\n       |     blog.simonklit.com    |\n        =========================== \n")
+print("\n        =========================== \n       |        DBA Reposter       |\n       |    by Simon Klit Pacis    |\n       |     blog.simonklit.com    |\n        =========================== \n")
 
 
 class Listing:
@@ -131,10 +131,9 @@ class Listing:
             },
             "bundlesAndProducts": {
                "productIds": [],
-               "bundleTypeId": 4
+               "bundleTypeId": package
             },
             "syiId": self.syi_id,
-            "bundleTypeId": package,
             "listingType": {
                "selectedListingType": 2
             }
