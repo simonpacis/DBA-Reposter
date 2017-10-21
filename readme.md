@@ -12,8 +12,9 @@ Scriptet er skrevet i Python og kræver følgende for at fungere:
 * requests (pip install requests - husk at installere det til python3 og ikke 2.7)  
   
 Bruges således:  
-python dbareposter.py username password [--keep=value] [--verify=value] [--premium=value]  
+python dbareposter.py username password [--keep=integer|default:10] [--premium=boolean|default:false] [--repostall=boolean|default:false] [--verify=boolean|default:true]  
 --keep=value: Venter indtil scriptet er kørt x-antal gange før repostede listings slettes.   
---verify=value: Slå SSL verifikation til eller fra, med argumenterne "True" og "False".  
+--repostall=value: Whether or not to repost a listing even if it is inactive or has comments.
 --premium=value:  Whether or not to post new listings as premium listings.  
-  
+--verify=value: Slå SSL verifikation til eller fra, med argumenterne "True" og "False".  
+
