@@ -88,8 +88,10 @@ class Listing:
                  'matrixGroups'][maximum]['matrixElements'][0]['id']
              matrixGroup["value"] = group['value']
              crafted_matrixData.append(matrixGroup)
+      self.pictures = []
       if os.path.exists("images/" + str(self.custom_id)):
          iter = 0
+         print("Uploading images.")
          for filename in os.listdir("images/" + str(self.custom_id)):
             iter = iter + 1
             if filename.endswith(".jpg"):
@@ -97,7 +99,7 @@ class Listing:
                   image = fh.read()
                   request = requests.post(
                       "https://api.dba.dk/api/v2/syi/pictures/upload/", headers=upload_headers, data=image, verify=verify).json()
-               self.pictures.append(request["pictureIds"][0])
+                  self.pictures.append(request["pictureIds"][0])
          request = requests.post("https://api.dba.dk/api/v2/syi/pictures/set/", headers=headers, json={'syiId': self.syi_id, 'pictures': self.pictures}, verify=verify).json()
       else:
          request = requests.post("https://api.dba.dk/api/v2/syi/pictures/set/", headers=headers, json={'syiId': self.syi_id, 'pictures': []}, verify=verify).json()
@@ -154,7 +156,7 @@ package = 4
 run_any_listing = False
 
 if len(sys.argv) <= 1:
-   print("Usage: python %s username password [--keep=integer|default:10] [--premium=boolean|default:false] [--repostall=boolean|default:false] [--verify=boolean|default:false] \n\tusername: Username/email for dba.dk\n\tpassword: Password for dba.dk\n\t--keep: Does not delete the original listing after repost.\n\t--repostall: Whether or not to repost a listing even if it is inactive or has comments.\n\t--premium: Whether or not to post new listings as premium listings.\n\t--verify: Whether or not to perform SSL verification." % (sys.argv[0]))
+   print("Usage: python %s username password [--keep=integer|default:10] [--premium=boolean|default:false] [--repostall=boolean|default:false] [--verify=boolean|default:true] \n\tusername: Username/email for dba.dk\n\tpassword: Password for dba.dk\n\t--keep: Does not delete the original listing after repost.\n\t--repostall: Whether or not to repost a listing even if it is inactive or has comments.\n\t--premium: Whether or not to post new listings as premium listings.\n\t--verify: Whether or not to perform SSL verification." % (sys.argv[0]))
    sys.exit(0)
 else:
     args = sys.argv[3:]
@@ -181,7 +183,7 @@ else:
             else:
                 run_any_listing = False
 
-print("Amount of days to keep listing alive set to %s." % (keep))
+print("Amount of runs to keep listing alive set to %s." % (keep))
 print("Package tier set to " + ('premium' if package == 3 else 'free') + ".")
 print(('Reposting only active listings with no comments.' if run_any_listing == False else 'Reposting all listings.'))
 print("\n")
