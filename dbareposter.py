@@ -48,12 +48,12 @@ class Listing:
       return
 
    def create(self):
-      syi_headers = {"X-Ad-Id": "7DC858CF-0522-40D3-9D5E-65EADF3983DE", 'dbaapikey': '2abb0a87-9e2f-4bdd-3d79-08d3e9335416',
-          'User-Agent': 'dba/5.4.3 iPhone 10.0.1 (iPhone6,2)', 'Authorization': 'oauth ' + access_token, 'X-InstallationId': 'e9ad3824fd4d47c6b46e1e7bfc98c07b', 'X-Dba-AppVersion': '5.4.3.2'}
-      create_headers = {"X-Ad-Id": "7DC858CF-0522-40D3-9D5E-65EADF3983DE", 'Content-Type': 'application/json', 'X-Ad-DFP-Impression-Counter': 0, 'Accept-Language': 'en-us', 'dbaapikey': '2abb0a87-9e2f-4bdd-3d79-08d3e9335416',
-          'User-Agent': 'dba/5.4.3 iPhone 10.0.1 (iPhone6,2)', 'Authorization': 'oauth ' + access_token, 'X-InstallationId': 'e9ad3824fd4d47c6b46e1e7bfc98c07b', 'X-Dba-AppVersion': '5.4.3.2'}
-      upload_headers = {'dbaapikey': '2abb0a87-9e2f-4bdd-3d79-08d3e9335416', 'Accept': 'application/json',
-          'Content-Type': 'image/jpeg', 'User-Agent': 'dba/5.4.3 iPhone 10.0.1 (iPhone6,2)', 'Authorization': 'oauth ' + access_token}
+      syi_headers = {"X-Ad-Id": "7DC858CF-0522-40D3-9D5E-65EADF3983DE", 'dbaapikey': '93d8cbae-ae89-47bb-a423-08d646555519',
+          'User-Agent': 'dba/5.9 iPhone 12.1 (iPhone10,6)', 'Authorization': 'oauth ' + access_token, 'X-InstallationId': 'e9ad3824fd4d47c6b46e1e7bfc98c07b', 'X-Dba-AppVersion': '5.4.3.2'}
+      create_headers = {"X-Ad-Id": "7DC858CF-0522-40D3-9D5E-65EADF3983DE", 'Content-Type': 'application/json', 'X-Ad-DFP-Impression-Counter': 0, 'Accept-Language': 'en-us', 'dbaapikey': '93d8cbae-ae89-47bb-a423-08d646555519',
+          'User-Agent': 'dba/5.9 iPhone 12.1 (iPhone10,6)', 'Authorization': 'oauth ' + access_token, 'X-InstallationId': 'e9ad3824fd4d47c6b46e1e7bfc98c07b', 'X-Dba-AppVersion': '5.4.3.2'}
+      upload_headers = {'dbaapikey': '93d8cbae-ae89-47bb-a423-08d646555519', 'Accept': 'application/json',
+          'Content-Type': 'image/jpeg', 'User-Agent': 'dba/5.9 iPhone 12.1 (iPhone10,6)', 'Authorization': 'oauth ' + access_token}
 
       request = requests.put(
           "https://api.dba.dk/api/v2/syi/start", headers=headers, verify=verify).json()
@@ -197,14 +197,14 @@ username = bytes(sys.argv[1], 'UTF-8')
 password = bytes(sys.argv[2], 'UTF-8')
 
 login_url = "https://api.dba.dk/api/v2/oauth/accesstoken"
-login_headers = {'dbaapikey': '2abb0a87-9e2f-4bdd-3d79-08d3e9335416', 'User-Agent': 'dba/5.4.3 iPhone 10.0.1 (iPhone6,2)'}
+login_headers = {'dbaapikey': '93d8cbae-ae89-47bb-a423-08d646555519', 'User-Agent': 'dba/5.9 iPhone 12.1 (iPhone10,6)'}
 r = requests.post(login_url, data={'username': username, 'password': password}, headers= login_headers, verify=verify).json()
 
 if(r['success'] == True):
    logged_in = True
    access_token = r['access_token']
    refresh_token = r['refresh_token']
-   headers = {'dbaapikey': '2abb0a87-9e2f-4bdd-3d79-08d3e9335416', 'Content-Type':'application/json', 'User-Agent': 'dba/5.4.3 iPhone 10.0.1 (iPhone6,2)', 'Authorization': 'oauth ' + access_token}
+   headers = {'dbaapikey': '93d8cbae-ae89-47bb-a423-08d646555519', 'Content-Type':'application/json', 'User-Agent': 'dba/5.9 iPhone 12.1 (iPhone10,6)', 'Authorization': 'oauth ' + access_token}
    print("Logged in as: " + requests.get("https://api.dba.dk/api/v2/user/profile", headers=headers, verify=verify).json()['summary']['display-name'])
 else:
    print("Incorrect credentials. Exiting script.")
