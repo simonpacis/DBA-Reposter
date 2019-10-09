@@ -13,6 +13,6 @@ Bruges således:
 ```shell
 python dbareposter.py username password [--keep=integer|default:10] [--premium=boolean|default:false] [--repostall=boolean|default:false] [--verify=boolean|default:true]  
 --keep=value: Venter indtil scriptet er kørt x-antal gange før repostede listings slettes.   
---repostall=value: Whether or not to repost a listing even if it is inactive or has comments.  
---premium=value:  Whether or not to post new listings as premium listings.  
+--repostall=value: Hvis True repostes en listing selv hvis den er inaktiv eller har kommentarer.
+--premium=value: Hvis True postes nye listings som premium. OBS: Det koster, hvis du ikke har DBA+.  
 --verify=value: Slå SSL verifikation til eller fra, med argumenterne "True" og "False".  
